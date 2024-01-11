@@ -16,3 +16,6 @@
 #   CCAGGATTTACAGACTTTAAA
 #
 #   If $4 == "another" only the **first two sequence** should be output
+
+wget -P  $1 -N $2
+
