@@ -33,3 +33,5 @@ if [ -n "$filtered" ]; then
 	awk -v filtered="$filtered" '$0 ~ filtered {flag=1; next} />/{flag=0} !flag' ${destination_directory}/$(basename ${url} .gz ) >  ${destination_directory}/$(basename ${url} .gz ).filtered 
 fi
 
+cp -f ${destination_directory}/$(basename ${url} .gz).filtered ${destination_directory}/$(basename ${url} .gz)
+rm ${destination_directory}/$(basename ${url} .gz).filtered
