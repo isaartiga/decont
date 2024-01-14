@@ -11,10 +11,21 @@ bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/cont
 # Index the contaminants file
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
 
+list_sids=$(ls data/*.fastq.gz | cut -d"-" -f1 | sed "s:data/::" | uniq)
 # Merge the samples into a single file
-for sid in $(ls data/*.fastq.gz | cut -d"-" -f1 | sed "s:data/::" | uniq) #TODO
+for sid in $list_sids #TODO
 do
     bash scripts/merge_fastqs.sh data out/merged $sid
+done
+
+mamba install -y cutadapt
+mkdir -p out/trimmed
+mkdir -p log/cutadapt
+
+for sid  in $list_sids
+do 
+   cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
+     -o out/trimmed/"$sid".trimmed.fastq.gz out/merged/"$sid".fastq.gz > log/cutadapt/"$sid".log
 done
 
 # TODO: run cutadapt for all merged files
