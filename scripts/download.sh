@@ -16,6 +16,20 @@
 #   CCAGGATTTACAGACTTTAAA
 #
 #   If $4 == "another" only the **first two sequence** should be output
+#19
+url=$1
+destination_directory=$2
+unzip_yes_no=$3
+filtered=$4
 
-wget -P  $1 -N $2
+wget -P ${destination_directory} -N ${url}
+
+if [ ${unzip_yes_no} = "yes" ]; then
+        gunzip -k ${destination_directory}/$(basename ${url})
+fi
+
+if [ -n "$filtered" ]; then
+	echo ${filtered}
+	awk -v filtered="$filtered" '$0 ~ filtered {flag=1; next} />/{flag=0} !flag' ${destination_directory}/$(basename ${url} .gz ) >  ${destination_directory}/$(basename ${url} .gz ).filtered 
+fi
 
