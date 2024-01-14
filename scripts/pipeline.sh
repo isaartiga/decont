@@ -12,7 +12,7 @@ bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/cont
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
 
 # Merge the samples into a single file
-for sid in $(<list_of_sample_ids>) #TODO
+for sid in $(ls data/*.fastq.gz | cut -d"-" -f1 | sed "s:data/::" | uniq) #TODO
 do
     bash scripts/merge_fastqs.sh data out/merged $sid
 done
