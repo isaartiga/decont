@@ -18,19 +18,17 @@ do
     bash scripts/merge_fastqs.sh data out/merged $sid
 done
 
+# Install cutadapt and create output directories 
 mamba install -y cutadapt
 mkdir -p out/trimmed
 mkdir -p log/cutadapt
 
+# Remove the adapters from the data merged
 for sid  in $list_sids
 do 
    cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
      -o out/trimmed/"$sid".trimmed.fastq.gz out/merged/"$sid".fastq.gz > log/cutadapt/"$sid".log
 done
-
-# TODO: run cutadapt for all merged files
-# cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
-#     -o <trimmed_file> <input_file> > <log_file>
 
 # TODO: run STAR for all trimmed files
 for fname in out/trimmed/*.fastq.gz
