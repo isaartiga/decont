@@ -1,8 +1,9 @@
-#Download all the files specified in data/filenames
-for url in $(egrep '^https://*' data/urls) #TODO
-do
-    bash scripts/download.sh $url data
-done
+# Download all the files specified in data/urls
+# for url in $(egrep '^https://*' data/urls) 
+# do
+#    bash scripts/download.sh $url data
+# done
+wget -i data/urls -P data
 
 # Download the contaminants fasta file, uncompress it, and
 # filter to remove all small nuclear RNAs
