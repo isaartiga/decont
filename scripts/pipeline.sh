@@ -41,10 +41,20 @@ do
         --readFilesCommand gunzip -c --outFileNamePrefix out/star/$sid/
 done
 
-# TODO: create a log file containing information from cutadapt and star logs
-# (this should be a single log file, and information should be *appended* to it on each run)
+# Create a log file (Log.out) containing information from cutadapt and star logs
 # - cutadapt: Reads with adapters and total basepairs
 # - star: Percentages of uniquely mapped reads, reads mapped to multiple loci, and to too many loci
-# tip: use grep to filter the lines you're interested in
+
+for sid in $list_sids
+do 
+   (echo "$sid:" && cat log/cutadapt/$sid.log |\
+   egrep 'Reads with adapters|Total basepairs'|\
+   sed 's/:[[:space:]]*/: /g' && \
+   cat out/star/$sid/Log.final.out |\
+   egrep 'Uniquely mapped reads %|Number of reads mapped to (multiple|too many) loci|' |\
+   sed 's/^[[:space:]]*//;s/ |[[:space:]]*/: /' && \
+   echo " ")\
+   >> Log.out
+done
 
 
