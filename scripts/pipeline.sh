@@ -12,9 +12,11 @@ bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/cont
 # Index the contaminants file
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
 
+# Identify a list of sample IDs (sid)
 list_sids=$(ls data/*.fastq.gz | cut -d"-" -f1 | sed "s:data/::" | uniq)
-# Merge the samples into a single file
-for sid in $list_sids #TODO
+
+# Merge the samples into a single file for each sid
+for sid in $list_sids
 do
     bash scripts/merge_fastqs.sh data out/merged $sid
 done
@@ -31,10 +33,10 @@ do
      -o out/trimmed/"$sid".trimmed.fastq.gz out/merged/"$sid".fastq.gz > log/cutadapt/"$sid".log
 done
 
-# TODO: run STAR for all trimmed files
+# Run STAR alignment for all trimmed files and keep the non-aligned reads
 for fname in out/trimmed/*.fastq.gz
 do
-    # you will need to obtain the sample ID from the filename
+    # Obtain the sample ID from the filename
     sid=$(basename $fname .trimmed.fastq.gz)
     mkdir -p out/star/$sid
     STAR --runThreadN 4 --genomeDir res/contaminants_idx \
