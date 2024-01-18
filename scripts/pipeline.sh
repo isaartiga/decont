@@ -70,14 +70,7 @@ done
 
 for sid in $list_sids
 do 
-   (echo "$sid:" && cat log/cutadapt/$sid.log |\
-   egrep 'Reads with adapters|Total basepairs'|\
-   sed 's/:[[:space:]]*/: /g' && \
-   cat out/star/$sid/Log.final.out |\
-   egrep 'Uniquely mapped reads %|Number of reads mapped to (multiple|too many) loci|' |\
-   sed 's/^[[:space:]]*//;s/ |[[:space:]]*/: /' && \
-   echo " ")\
-   >> Log.out
-done
+   echo "$sid:" && (cat log/cutadapt/$sid.log | egrep 'Reads with adapters|Total basepairs'| sed 's/:[[:space:]]*/: /g') && (cat out/star/$sid/Log.final.out | egrep 'Uniquely mapped reads %|Number of reads mapped to (multiple|too many) loci' | sed 's/^[[:space:]]*//;s/ |[[:space:]]*/: /') && echo " "
+done >> Log.out
 
 
