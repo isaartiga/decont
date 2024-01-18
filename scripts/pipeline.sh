@@ -1,13 +1,33 @@
+# This script must be used from the decont repository
+
 # Download all the files specified in data/urls
-# for url in $(egrep '^https://*' data/urls) 
+# for url in $(egrep '^https://*' data/urls)
 # do
 #    bash scripts/download.sh $url data
 # done
+
 wget -i data/urls -P data
+
+# Check MD5
+for url in $(egrep '^https://*' data/urls)
+do
+   download_file=$(basename $url)
+   if [ -e data/$download_file ]; then
+        md5_url=${url}.md5
+        md5_expected=$(wget -qO- $md5_url | cat | cut -d " " -f 1)
+        md5_obteined=$(md5sum data/$download_file  | cut -d " " -f 1)
+        if [ $md5_expected == $md5_obteined ]; then
+           echo "MD5 of '$download_file' successfully verified"
+        else
+           echo "Error! MD5 verification failed for '$download_file'."
+        fi
+   fi
+done
 
 # Download the contaminants fasta file, uncompress it, and
 # filter to remove all small nuclear RNAs
-bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz res yes "small nuclear RNA" #TODO
+
+bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz res yes "small nuclear RNA" 
 
 # Index the contaminants file
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
