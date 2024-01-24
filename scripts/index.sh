@@ -5,9 +5,6 @@
 target=$1
 output_directory=$2
 
-# Install STAR
-mamba install -y star
-
 # Create the output directory if it doesn´t exist
 mkdir -p res/$(basename ${target} .fasta)_idx
 
