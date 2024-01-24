@@ -59,18 +59,25 @@ do
     # Obtain the sample ID from the filename
     sid=$(basename $fname .trimmed.fastq.gz)
     mkdir -p out/star/$sid
-    STAR --runThreadN 4 --genomeDir res/contaminants_idx \
-        --outReadsUnmapped Fastx --readFilesIn $fname \
-        --readFilesCommand gunzip -c --outFileNamePrefix out/star/$sid/
+    if [ -z "$(ls -a "out/star/$sid")" ]; then
+	echo "PRUEBA"
+    else
+	STAR --runThreadN 4 --genomeDir res/contaminants_idx \
+         --outReadsUnmapped Fastx --readFilesIn $fname \
+         --readFilesCommand gunzip -c --outFileNamePrefix out/star/$sid/
+   fi
 done
 
-# Create a log file (Log.out) containing information from cutadapt and star logs
+
+# Create a log file (pipeline.log) containing information from cutadapt and star logs
 # - cutadapt: Reads with adapters and total basepairs
 # - star: Percentages of uniquely mapped reads, reads mapped to multiple loci, and to too many loci
-
-for sid in $list_sids
-do 
-   echo "$sid:" && (cat log/cutadapt/$sid.log | egrep 'Reads with adapters|Total basepairs'| sed 's/:[[:space:]]*/: /g') && (cat out/star/$sid/Log.final.out | egrep 'Uniquely mapped reads %|Number of reads mapped to (multiple|too many) loci' | sed 's/^[[:space:]]*//;s/ |[[:space:]]*/: /') && echo " "
-done >> Log.out
-
+if [ -e "log/pipeline.log" ]; then
+   echo "The log file containing info from cutadapt and star logs already exists"
+else
+   for sid in $list_sids
+   do
+      echo "$sid:" && (cat log/cutadapt/$sid.log | egrep 'Reads with adapters|Total basepairs'| sed 's/:[[:space:]]*/: /g') && (cat out/star/$sid/Log.final.out | egrep 'Uniquely mapped reads %|Number of reads mapped to (multiple|too many) loci' | sed 's/^[[:space:]]*//;s/ |[[:space:]]*/: /') && echo " "
+   done >> log/pipeline.log
+fi
 
