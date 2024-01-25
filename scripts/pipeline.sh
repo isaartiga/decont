@@ -65,11 +65,12 @@ fi
 list_sids=$(ls data/*.fastq.gz | cut -d"-" -f1 | sed "s:data/::" | uniq)
 
 # Merge the samples into a single file for each sid
-echo "Merging samples "
+echo "Merging by samples: "
 for sid in $list_sids
 do
    if [ ! -e out/merged/$sid* ]; then
       bash scripts/merge_fastqs.sh data out/merged $sid
+      echo "$sid merged"
    else
       echo "$sid already merged"
    fi
