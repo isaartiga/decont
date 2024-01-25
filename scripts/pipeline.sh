@@ -5,10 +5,31 @@
 # do
 #    bash scripts/download.sh $url data
 # done
-wget -i data/urls -P data
+
+# Identify fastq files already downloaded and urls to download
+fastq_files=$(ls data | egrep '*.fastq.gz$')
+urls_list=$(egrep '^https://*' data/urls)
+
+# Check if files in data/urls are downloaded
+# if not, dowload them
+echo "Downloading data files:"
+if [ -z "$fastq_files" ]; then
+   wget -i data/urls -P data
+else
+   for url in $urls_list
+   do
+      download_file=$(basename $url)
+      if [ -e data/$download_file ]; then
+         echo "$download_file already downloaded"
+      else
+         wget -P data -N $url
+      fi
+   done
+fi
 
 # Check MD5
-for url in $(egrep '^https://*' data/urls)
+echo "Cheking MD5 for downloaded files: "
+for url in $urls_list
 do
    download_file=$(basename $url)
    if [ -e data/$download_file ]; then
@@ -25,13 +46,15 @@ done
 
 # Download the contaminants fasta file, uncompress it, and
 # filter to remove all small nuclear RNAs
+echo "Downloading contaminants file: "
 if [ -e res/contaminants.fasta ]; then
-   echo "The contaminants.fasta file already exists"
+   echo "Contaminants.fasta file already exists"
 else
    bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz res yes "small nuclear RNA" 
 fi
 
 # Index the contaminants file
+echo "Indexing contaminants: "
 if [[ ! -d res/contaminants_idx ]] || [[ ! "$(ls res/contaminants_idx)" ]]; then
    bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
 else
@@ -42,6 +65,7 @@ fi
 list_sids=$(ls data/*.fastq.gz | cut -d"-" -f1 | sed "s:data/::" | uniq)
 
 # Merge the samples into a single file for each sid
+echo "Merging samples "
 for sid in $list_sids
 do
    if [ ! -e out/merged/$sid* ]; then
@@ -56,6 +80,7 @@ mkdir -p out/trimmed
 mkdir -p log/cutadapt
 
 # Remove the adapters from the data merged
+echo "Removing adapters: "
 for sid  in $list_sids
 do
    if [[ ! -e log/cutadapt/$sid.log ]] || [[ ! -e out/trimmed/$sid.trimmed.fastq.gz ]]; then
@@ -67,6 +92,7 @@ do
 done
 
 # Run STAR alignment for all trimmed files and keep the non-aligned reads
+echo "Running alignment: "
 for fname in out/trimmed/*.fastq.gz
 do
     # Obtain the sample ID from the filename
@@ -93,4 +119,3 @@ else
       echo "$sid:" && (cat log/cutadapt/$sid.log | egrep 'Reads with adapters|Total basepairs'| sed 's/:[[:space:]]*/: /g') && (cat out/star/$sid/Log.final.out | egrep 'Uniquely mapped reads %|Number of reads mapped to (multiple|too many) loci' | sed 's/^[[:space:]]*//;s/ |[[:space:]]*/: /') && echo " "
    done >> log/pipeline.log
 fi
-
