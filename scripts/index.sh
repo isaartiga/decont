@@ -6,8 +6,8 @@ target=$1
 output_directory=$2
 
 # Create the output directory if it doesn´t exist
-mkdir -p res/$(basename ${target} .fasta)_idx
+mkdir -p ${output_directory}
 
 # Index genome/contaminants
-STAR --runThreadN 4 --runMode genomeGenerate --genomeDir res/$(basename ${target} .fasta)_idx \
+STAR --runThreadN 4 --runMode genomeGenerate --genomeDir ${output_directory} \
 --genomeFastaFiles ${target} --genomeSAindexNbases 9

@@ -46,11 +46,12 @@ done
 
 # Download the contaminants fasta file, uncompress it, and
 # filter to remove all small nuclear RNAs
+contaminants_url="https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz"
 echo "Downloading contaminants file: "
 if [ -e res/contaminants.fasta ]; then
    echo "Contaminants.fasta file already exists"
 else
-   bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz res yes "small nuclear RNA" 
+   bash scripts/download.sh $contaminants_url res yes "small nuclear RNA"
 fi
 
 # Index the contaminants file
@@ -85,6 +86,7 @@ echo "Removing adapters: "
 for sid  in $list_sids
 do
    if [[ ! -e log/cutadapt/$sid.log ]] || [[ ! -e out/trimmed/$sid.trimmed.fastq.gz ]]; then
+      echo "$sid :"
       cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
         -o out/trimmed/"$sid".trimmed.fastq.gz out/merged/"$sid".fastq.gz > log/cutadapt/"$sid".log
    else
@@ -119,4 +121,5 @@ else
    do
       echo "$sid:" && (cat log/cutadapt/$sid.log | egrep 'Reads with adapters|Total basepairs'| sed 's/:[[:space:]]*/: /g') && (cat out/star/$sid/Log.final.out | egrep 'Uniquely mapped reads %|% of reads mapped to (multiple|too many) loci' | sed 's/^[[:space:]]*//;s/ |[[:space:]]*/: /') && echo " "
    done >> log/pipeline.log
+   echo "pipeline.log done"
 fi

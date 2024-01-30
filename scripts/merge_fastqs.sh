@@ -10,7 +10,7 @@ output_directory=$2
 sid=$3
 
 # Create output directory in case it doesn´t exist
-mkdir -p out/merged
+mkdir -p ${output_directory}
 
 # Merge the fastqs from the same sample into a single file
 cat ${origen_directory}/${sid}* > ${output_directory}/${sid}.fastq.gz

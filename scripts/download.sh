@@ -22,9 +22,9 @@ fi
 
 #   Check if a filter is provided ($filtered), then use AWK to filter the contents of the file, excluding sequences that contain the filter words in their description.
 if [ -n "$filter" ]; then
-	awk -v filter="$filter" '$0 ~ filter {flag=1; next} />/{flag=0} !flag' ${destination_directory}/$(basename ${url} .gz ) >  ${destination_directory}/$(basename ${url} .gz ).filtered 
+	awk -v filter="$filter" '$0 ~ filter {flag=1; next} />/{flag=0} !flag' ${destination_directory}/$(basename ${url} .gz ) >  filtered_file
 fi
 
 #  Copy the filtered content to the original unzip file and remove the original filtered file
-cp -f ${destination_directory}/$(basename ${url} .gz).filtered ${destination_directory}/$(basename ${url} .gz)
-rm ${destination_directory}/$(basename ${url} .gz).filtered
+cp -f filtered_file ${destination_directory}/$(basename ${url} .gz)
+rm filtered_file
