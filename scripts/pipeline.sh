@@ -35,8 +35,8 @@ do
    if [ -e data/$download_file ]; then
         md5_url=${url}.md5
         md5_expected=$(wget -qO- $md5_url | cat | cut -d " " -f 1)
-        md5_obteined=$(md5sum data/$download_file  | cut -d " " -f 1)
-        if [ $md5_expected == $md5_obteined ]; then
+        md5_obtained=$(md5sum data/$download_file  | cut -d " " -f 1)
+        if [ $md5_expected == $md5_obtained ]; then
            echo "MD5 of '$download_file' successfully verified"
         else
            echo "Error! MD5 verification failed for '$download_file'."
